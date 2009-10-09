@@ -1,0 +1,29 @@
+Usage: hype <action>[:host] [options]
+
+Actions can very from host to host, but hosts generally
+offer one or more of the following services:
+
+  publish       Publish website
+  release       Release package
+  announce      Announce release
+  touch         Check host availability
+
+Specifying a host name limits the action to that specific host.
+If no host name is given, then each host that responds to the
+given action will be invoked in turn. A confirmation prompt will
+appear for each host unless --force is used.
+
+Action and host options can be given on the command line using
+opt=arg notation. To facilitate easy reuse, however, place options
+in the hype configuration file. 
+
+The following options are for the commandline only and are common
+to all commands.
+
+  -n --dryrun      Only pretend to do action
+  -d --debug       Output detailed error reports
+  -f --force       Automatically answer 'y' to queires
+  -h --help        Display help information
+
+See API documentation to learn the options for each action and host.
+

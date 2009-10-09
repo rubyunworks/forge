@@ -1,0 +1,25 @@
+= Forge
+
+* http://proutils.github.com/forge
+* http://github.com/proutils/forge
+
+
+== DESCRIPTION
+
+Forge is similar to the widely used +rubyforge+ gem. The main
+difference is that +forge+ if POM aware, and therefore does not
+need to keep configuration scripts in your home folder to work.
+This makes it muich easier to use as project tool.
+
+The current version uses the old school HTTP scrapng techinique.
+The next version will use the new api.rubyforge.org REST API.
+
+
+== COPYRIGHTS
+
+(GPL Licensed)
+
+Copyright (c) 2004,2009 Thomas Sawyer
+
+[INSERT NOTICE]
+

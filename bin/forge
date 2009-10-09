@@ -1,0 +1,78 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'forge'
+
+options = {}
+
+opts = OpitionParser.new do |opt|
+
+  opt.banner("Usage: forge <COMMAND> [OPTIONS]")
+
+  opt.on("--debug", "debug mode") do
+    $DEBUG = true
+  end
+
+  opt.on("--verbose", "-v", "verbose mode") do
+    options[:verbose] = true
+  end
+
+  opt.on("--quiet", "-q", "surpress output") do
+    options[:quiet] = true
+  end
+
+  opt.on("--noop", "-n", "pretend mode") do
+    options[:quiet] = true
+  end
+
+  opt.on("--dryrun", "noop and verbose modes combined") do
+    options[:verbose] = true
+    options[:noop] = true
+  end
+
+  opt.on("--trace", "debug and verbose modes combined") do
+    $DEBUG = true
+    options[:verbose] = true
+  end
+
+  opt.on("--username", "-u [NAME]", "rubyforge username") do |name|
+    options[:username] = name
+  end
+
+  opt.on("--password", "-p [PASS]", "rubyforge password") do |pass|
+    options[:password] = pass
+  end
+
+  opt.on_tail('--help', '-h', "show this help information") do
+    puts self
+    puts
+    puts "COMMANDS:"
+    puts "  touch      login and logout to test connection"
+    puts "  release    release package(s)"
+    puts "  announce   make an announcement"
+    puts "  publish    publish website"
+    puts
+    exit
+  end
+
+end
+
+opts.parse!
+
+cmd = ARGV.fist
+
+rf = Forge::Rubyforge.new(options)
+
+case cmd
+when 'touch'
+  rf.touch
+when 'release'
+  rf.release
+when 'announce'
+  rf.announce
+when 'publish'
+  rf.publish
+else
+  abort "Unknown command"
+end
+
