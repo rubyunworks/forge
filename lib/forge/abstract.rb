@@ -5,9 +5,7 @@ require 'tmpdir'
 require 'enumerator'
 
 require 'ostruct'
-require 'httpclient'
 
-#require 'facets' #/hash/rekey'
 require 'facets/kernel/ask'
 require 'facets/module/alias_accessor'
 require 'facets/hash/rekey'
@@ -16,29 +14,48 @@ require 'pom/project'
 
 module Forge
 
-  # = Support base
+  # = Support base class
   #
-  class Base
+  class AbstractHost
 
-    attr_accessor :dryrun
     attr_accessor :verbose
-    attr_accessor :quiet
-    attr_accessor :trace
-    attr_accessor :debug
     attr_accessor :force
     attr_accessor :metadata  # get this from Reap
 
-    def quiet?   ; @quiet   ; end
-    def verbose? ; @verbose ; end
-    def force?   ; @force   ; end
-    def dryrun?  ; @dryrun  ; end
-    def trace?   ; @trace   ; end
-    def debug?   ; @debug   ; end
+    attr_accessor :trial
+    attr_accessor :debug
+    attr_accessor :trace
+    attr_accessor :quiet
 
-    # TODO: Can we get this from Reap?
-    #def metadata
-    #  @metadata ||= Pom::Metadata.new
-    #end
+    #def verbose? ; @verbose ; end
+    def force?   ; @force   ; end
+
+    def debug?   ; $DEBUG || @debug ; end
+    def trial?   ; $TRAIL || @trial ; end
+    def trace?   ; $TRACE || @trace ; end
+    def quiet?   ; $QUIET || @quiet ; end
+
+    #
+    def project
+      @project ||= POM::Project.new(Dir.pwd)
+    end
+
+    #
+    def metadata
+      project.metadata
+    end
+
+    #
+    def config
+      @config ||=(
+        if file = Dir['{,.}config/forge.yml']
+          data = YAML.load(file)
+        else
+          data = {}
+        end
+        OpenStruct.new(data)
+      )
+    end
 
    private
 
@@ -74,16 +91,17 @@ module Forge
       return text
     end
 
-
     #
     def mkdir_p(dir)
-      fu.mkdir_p(dir)
+      fu.mkdir_p(dir) unless File.directory?(dir)
     end
 
     #
     def fu
-      if dryrun?
+      if trial?
         FileUtils::DryRun
+      elsif trace?
+        FileUtils::Verbose
       else
         FileUtils
       end

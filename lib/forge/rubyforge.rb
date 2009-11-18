@@ -1,4 +1,5 @@
-require 'forge/base'
+require 'forge/abstract'
+require 'httpclient'
 
 module Forge
 
@@ -14,7 +15,12 @@ module Forge
   #
   # TODO: Switch to REST API using HTTParty
   #
-  class Rubyforge < Base
+  class Rubyforge < AbstractHost
+
+    require 'forge/rubyforge/touch'
+    require 'forge/rubyforge/release'
+    require 'forge/rubyforge/publish'
+    require 'forge/rubyforge/post'
 
     #register('rubyforge', 'rubyforge.org')
     #service_action :publish  => :deploy
@@ -33,9 +39,8 @@ module Forge
 
     # Project's group id number.
     attr_accessor :group_id
-
-    alias_accessor :group   , :group_id
-    alias_accessor :groupid , :group_id
+    alias_accessor :group, :group_id
+    alias_accessor :groupid, :group_id
 
     # Username for project account.
     attr_accessor :username
@@ -44,25 +49,13 @@ module Forge
     attr_accessor :password
 
     #
+    attr_accessor :domain
+
+    #
     #attr_accessor :package
 
     #
     #attr_accessor :version
-
-    #
-    attr_accessor :domain
-
-    #
-    attr_accessor :dryrun
-
-    #
-    attr_accessor :noop
-
-    #
-    attr_accessor :quiet
-
-    #
-    attr_accessor :verbose
 
     private
 
@@ -71,21 +64,18 @@ module Forge
       super
 
       # Must be a POM::Project object.
-      @project = options[:project]
-
-      # change to unixname
-      @unixname   = options[:unixname] || metadata.project
-
-      #@version  = metadata.version
-
-      @username = options[:username] || ENV['RUBYFORGE_USERNAME']
-      @password = options[:password] || ENV['RUBYFORGE_PASSWORD']
+      #@project = options[:project]
 
       @domain   = DOMAIN
 
       options.each do |k,v|
         send("#{k}=", v) if respond_to?("#{k}=")
       end
+
+      @unixname ||= metadata.collection
+      #@version ||= metadata.version
+      @username ||= ENV['RUBYFORGE_USERNAME']
+      @password ||= ENV['RUBYFORGE_PASSWORD']
 
       raise "missing 'unixname' name in #{self.class.name}" unless unixname
       #raise "missing domain in #{self.class.name}" unless domain
@@ -97,24 +87,16 @@ module Forge
       @file_ids    = {}
     end
 
-    def metadata
-      project.metadata
-    end
+  public
 
-    def project
-      @project ||= POM::Project.new(Dir.pwd)
-    end
-
-    public
-
-    def dryrun?  ; @dryrun   ; end
-    def quiet?   ; @quiet    ; end
-    def verbose? ; @verbose  ; end
+    #def trial? ; $TRIAL ; end
+    #def debug? ; $DEBUG ; end
+    #def trace? ; $TRACE ; end
+    #def quiet? ; $QUIET ; end
 
     # URI = http:// + domain name
     #
     # TODO: Deal with https, and possible other protocols too.
-
     def uri
       @uri ||= URI.parse("http://" + domain)
     end
@@ -229,13 +211,13 @@ module Forge
 
       unixname  = self.unixname
 
-      package   = options[:package] || metadata.package
+      package   = options[:package] || metadata.name
       version   = options[:version] || metadata.version
 
-      date      = options[:date] || Time::now.strftime('%Y-%m-%d %H:%M')
+      date      = options[:date]    || metadata.released || Time::now.strftime('%Y-%m-%d %H:%M')
 
-      changes   = options[:changes]
-      notes     = options[:notes]
+      changes   = options[:changes] || project.history.releases[0].changes
+      notes     = options[:notes]   || project.history.releases[0].note
 
       release   = options[:release] || version
 
@@ -297,10 +279,10 @@ module Forge
         raise ArgumentError, "missing group_id" unless group_id
 
         unless package_id = package?(package)
-          if dryrun?
+          if trial?
             puts "Package '#{package}' does not exist."
             puts "Create package #{package}."
-            abort "Cannot continue in dryrun mode."
+            abort "Cannot continue in trial mode."
           else
             #unless options['force']
             q = "Package '#{package}' does not exist. Create?"
@@ -316,7 +298,7 @@ module Forge
         end
         if release_id = release?(release, package_id)
           #unless options[:force]
-          if dryrun?
+          if trial?
             puts "Release #{release} already exists."
           else
             q = "Release #{release} already exists. Re-release?"
@@ -328,14 +310,14 @@ module Forge
           files.each do |file|
             fname = File.basename(file)
             if file_id = file?(fname, package)
-              if dryrun?
+              if trial?
                 puts "Remove file #{fname}."
               else
                 puts "Removing file #{fname}..."
                 remove_file(file_id, release_id, package_id)
               end
             end
-            if dryrun?
+            if trial?
               puts "Add file #{fname}."
             else
               puts "Adding file #{fname}..."
@@ -343,7 +325,7 @@ module Forge
             end
           end
         else
-          if dryrun?
+          if trial?
             puts "Add release #{release}."
           else
             puts "Adding release #{release}..."
@@ -363,7 +345,7 @@ module Forge
           #end
         end
       end
-      puts "Release complete!" unless dryrun?
+      puts "Release complete!" unless trial?
     end
 
     PACKAGE_STORES = %w{pack pkg .cache/pkg}
@@ -396,14 +378,10 @@ module Forge
 
       raise "no username" unless username
 
-      sitemap = options['sitemap'] || metadata.sitemap
-      filter  = options['filter']
-      delete  = options['delete']
-      optargs = options['optargs']
-
-      #quiet   = options['quiet']   || !verbose? #quiet?
-      #verbose = options['verbose'] || verbose?
-      #dryrun  = %w{dryrun noharm pretend}.any?{ |x| options[x] } || dryrun?
+      sitemap = options['sitemap'] || config.sitemap
+      filter  = options['filter']  || config.rsync_filter
+      delete  = options['delete']  || config.rsync_delete
+      optargs = options['extra']   || config.rsync_extra
 
       case sitemap
       when Hash
@@ -432,10 +410,10 @@ module Forge
         url = "#{username}@rubyforge.org:/var/www/gforge-projects/#{destination}"
 
         op = ["-rLvz"]  # maybe -p ?
-        op << "-n"          if dryrun?
-        op << "-v"          if verbose?
-        op << "-q"          if not verbose?
-        op << "--progress"  if not quiet?
+        op << "-n"          if trial?
+        op << "-v"          if not quiet?
+        op << "-q"          if quiet?
+        op << "--progress"  if trace?
         op << "--del-after" if delete
         op << optargs       if optargs
 
@@ -452,8 +430,8 @@ module Forge
 
         cmd = "rsync " + op.join(' ')  # "rsync #{op.to_params}"
 
-        # rsync supports a dryrun mode. let it through?
-        #if dryrun?
+        # rsync supports a trial mode. let it through?
+        #if trial?
         #  puts cmd
         #else
           system cmd  #UploadUtils.rsync(options)
@@ -506,7 +484,7 @@ module Forge
         message = options[:message] || options[:body]
       end
 
-      if dryrun?
+      if trial?
         puts "announce-rubyforge: #{subject}"
       else
         post_news(subject, message)

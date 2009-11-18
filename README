@@ -1,0 +1,44 @@
+= Forge
+
+* http://proutils.github.com/forge
+* http://github.com/proutils/forge
+
+
+== DESCRIPTION
+
+Forge is an API and command-line interface for on-line GForge-based
+project development management tools.
+
+Currently is supports only RubyForge, as this was the original usecase
+for which this project was developed. Now that RubyForge is being phased
+out this project needs to focus on supporting other GForge sites, in
+particular SourceForge.
+
+For RubyForge users, this project is similar to the widely used +rubyforge+
+gem. The main difference is that +forge+ is POM aware, and therefore does
+not need to keep configuration scripts in a $HOME configuration folder
+to work. This makes it muich easier to use as a project tool.
+
+The current version of the RubyForge uses the old school HTTP scraping
+techinique. The next version may use the new api.rubyforge.org REST API,
+however, since RubyForge is being phased out as mentioned above, this
+is a low-priority and may not occur. Moreover the HTTP scraping currently
+used may prove important for supporting SourceForge and other sites since
+they still lack any sort of RESTful or SOAP API.
+
+
+== DEVELOPMENT
+
+Currently the project is hosted on GitHub. Given the nature of the project
+it may be moved to SourceForge in the near future, renaming it to LaForge
+in the process.
+
+
+== COPYRIGHTS
+
+(LGPL Licensed)
+
+Copyright (c) 2004,2009 Thomas Sawyer
+
+See COPYING for details.
+
