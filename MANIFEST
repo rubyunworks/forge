@@ -1,0 +1,24 @@
+#!mast bin lib meta test [A-Z]*
+bin/forge
+lib/forge/abstract.rb
+lib/forge/command.rb
+lib/forge/rubyforge/abstract.rb
+lib/forge/rubyforge/post.rb
+lib/forge/rubyforge/publish.rb
+lib/forge/rubyforge/release.rb
+lib/forge/rubyforge/touch.rb
+lib/forge/rubyforge.rb
+lib/forge/sourceforge.rb
+lib/forge.rb
+lib/syckle/services/rubyforge.rb
+meta/contact
+meta/name
+meta/released
+meta/repository
+meta/suite
+meta/summary
+meta/title
+meta/version
+README.rdoc
+HISTORY
+COPYING
