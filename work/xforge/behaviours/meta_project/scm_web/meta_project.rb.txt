@@ -1,0 +1,8 @@
+require 'meta_project/core_ext/string'
+require 'meta_project/project_analyzer'
+require 'meta_project/patois'
+require 'meta_project/project'
+require 'meta_project/tracker'
+require 'meta_project/scm_web'
+require 'meta_project/version_parser'
+require 'rake/contrib/xforge'

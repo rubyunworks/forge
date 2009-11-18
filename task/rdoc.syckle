@@ -1,10 +1,8 @@
 ---
 rdoc:
   service  : RDoc
-  templib  : rdazzle
   template : redfish
-  include  : [ lib, README, LICENSE ]
-  exclude  : [ "lib/rdoc/generator/template/redfish/" ]
+  include  : ~
   main     : ~
   extra    : ~
   active   : true
