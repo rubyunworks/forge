@@ -20,9 +20,20 @@ class Forge::Rubyforge
     attr_accessor :password
 
     #
+    attr :config
+
+    #
     def initialize
       $TRIAL = false
       $TRACE = false
+
+      @config = load_config
+
+      @unixname = @config['unixname']
+      @groupid  = @config['groupid']
+
+      @username = ENV['RUBYFORGE_USERNAME']
+      @password = ENV['RUBYFORGE_PASSWORD']
     end
 
     # Access to Rubyforge API
@@ -77,6 +88,19 @@ class Forge::Rubyforge
     # Override by subclasses.
     def parse
       opts_parser.parse!
+    end
+
+    #
+    def load_config
+      files = Dir['{config/,.config/,.}forge{,.yml,.yaml'].first
+      if files.size > 1
+        $stderr.puts "Warning: Multiple config files -- #{files.join(' ')}"
+      end
+      if file.first
+        YAML.load(File.new(file))
+      else
+        {}
+      end
     end
 
   end

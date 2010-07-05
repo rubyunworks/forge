@@ -125,7 +125,7 @@ module Syckle::Plugins
     private
 
       def initialize_defaults
-        @unixname = metadata.collection
+        @unixname = metadata.collection || metadata.suite
 
         @username = ENV['RUBYFORGE_USERNAME']
         @password = ENV['RUBYFORGE_PASSWORD']
