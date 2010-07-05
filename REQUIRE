@@ -1,0 +1,9 @@
+production:
+  requires:
+    - facets
+
+development:
+  requires:
+    - facets
+    - syckle
+    - rcov

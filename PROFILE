@@ -1,0 +1,12 @@
+--- 
+title: LaForge
+suite: proutils
+
+contact: proutils@googlegroups.com
+summary: POM-aware Rubyforge front-end
+authors: Thomas Sawyer
+
+resources:
+  homeage: http://proutils.gitub.com/forge
+  repository: git://github.com/proutils/forge.git
+
