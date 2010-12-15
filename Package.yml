@@ -1,7 +1,0 @@
-name: forge
-
-requires:
-  - facets
-  - syckle (build)
-  - rcov   (test)
-

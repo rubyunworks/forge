@@ -1,12 +1,22 @@
 --- 
-title: LaForge
-suite: proutils
+title  : Forge
+summary: POM-aware Rubyforge Front-End
+contact: Trans <transfire@gmail.com>
+license: Apache 2.0
 
-contact: proutils@googlegroups.com
-summary: POM-aware Rubyforge front-end
-authors: Thomas Sawyer
+requires:
+  - facets
+  - syckle (build)
+  - rcov   (test)
 
 resources:
-  homeage: http://proutils.gitub.com/forge
-  repository: git://github.com/proutils/forge.git
+  home: http://rubyworks.gitub.com/forge
+  code: http://gitub.com/rubyworks/forge
 
+repositories:
+  public: git://github.com/rubyworks/forge.git
+
+authors:
+  - Thomas Sawyer
+
+copyright: (c) 2006 Thomas Sawyer

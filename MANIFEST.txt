@@ -1,0 +1,19 @@
+#!mast -x [A-Z][a-z]* .ruby bin lib man spec test [A-Z]*
+.ruby
+bin/forge
+lib/forge/abstract.rb
+lib/forge/command.rb
+lib/forge/rubyforge/abstract.rb
+lib/forge/rubyforge/post.rb
+lib/forge/rubyforge/publish.rb
+lib/forge/rubyforge/release.rb
+lib/forge/rubyforge/touch.rb
+lib/forge/rubyforge.rb
+lib/forge/sourceforge/TODO
+lib/forge/sourceforge.rb
+lib/forge.rb
+lib/plugin/syckle/rubyforge.rb
+HISTORY.rdoc
+LICENSE
+README.rdoc
+ROADMAP
