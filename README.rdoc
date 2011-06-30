@@ -1,7 +1,10 @@
 = Forge
 
-* http://proutils.github.com/forge
-* http://github.com/proutils/forge
+
+== RESOURCES
+
+* Homepage[http://rubyworks.github.com/forge]
+* Development[http://github.com/rubyworks/forge]
 
 
 == DESCRIPTION
@@ -36,7 +39,7 @@ in the process.
 
 == COPYRIGHTS
 
-(Apache 2.0 License)
+(BSD 2 Clause License)
 
 Copyright (c) 2004 Thomas Sawyer
 
